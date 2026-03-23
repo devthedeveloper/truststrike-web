@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TrustStrike — Don't Trust Your Security. Prove It.</title>
+  <meta name="description" content="AI-powered autonomous penetration testing. TrustStrike deploys AI agents that think like real hackers — then shows you exactly how, with proof you can verify.">
+  <meta name="theme-color" content="#0a0a0f">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            bg: { primary: '#0a0a0f', secondary: '#12121a', tertiary: '#1a1a28' },
+            trust: { green: '#00ff88', dim: '#00cc6a' },
+            verify: { blue: '#3b82f6' },
+            vuln: { red: '#ff3366' },
+            hi: { purple: '#8b5cf6' },
+            txt: { primary: '#f0f0f5', secondary: '#a0a0b8', muted: '#606078' },
+            border: { subtle: '#1e1e2e', accent: '#2a2a3e' }
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace']
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { background: #0a0a0f; color: #f0f0f5; }
+    ::selection { background: rgba(0,255,136,0.2); }
+
+    /* Scroll reveal */
+    .reveal { opacity: 0; transform: translateY(30px); transition: opacity 0.7s ease, transform 0.7s ease; }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    /* Terminal cursor */
+    .cursor { display: inline-block; width: 8px; height: 18px; background: #00ff88; animation: blink 1s step-end infinite; vertical-align: middle; margin-left: 2px; }
+    @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0; } }
+
+    /* Glow */
+    .glow-green { box-shadow: 0 0 20px rgba(0,255,136,0.2), 0 0 60px rgba(0,255,136,0.08); }
+    .glow-green:hover { box-shadow: 0 0 30px rgba(0,255,136,0.35), 0 0 80px rgba(0,255,136,0.12); }
+
+    /* Grid bg */
+    .grid-bg { background-image: linear-gradient(rgba(0,255,136,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(0,255,136,0.04) 1px, transparent 1px); background-size: 60px 60px; }
+
+    /* Feature card hover */
+    .feature-card { transition: transform 0.3s ease, border-color 0.3s ease; }
+    .feature-card:hover { transform: translateY(-4px); border-color: rgba(0,255,136,0.3); }
+
+    /* Stage connector */
+    .stage-line { position: relative; }
+    .stage-line::after { content: ''; position: absolute; top: 50%; right: -2rem; width: 2rem; height: 2px; background: linear-gradient(90deg, #00ff88, transparent); }
+    @media (max-width: 768px) { .stage-line::after { display: none; } }
+
+    /* Pricing highlight */
+    .pricing-highlight { border-color: #00ff88; box-shadow: 0 0 30px rgba(0,255,136,0.1); }
+
+    /* Smooth number counter */
+    .counter { font-variant-numeric: tabular-nums; }
+  </style>
+</head>
+<body class="font-sans antialiased">
+
+  <!-- ====== NAV ====== -->
+  <nav class="fixed top-0 w-full z-50 border-b border-border-subtle bg-bg-primary/80 backdrop-blur-xl">
+    <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+      <a href="#" class="flex items-center gap-2 text-xl font-bold">
+        <span class="text-trust-green">⚡</span> TrustStrike
+      </a>
+      <div class="hidden md:flex items-center gap-8 text-sm text-txt-secondary">
+        <a href="#how-it-works" class="hover:text-txt-primary transition">How It Works</a>
+        <a href="#verification" class="hover:text-txt-primary transition">Verification</a>
+        <a href="#privacy" class="hover:text-txt-primary transition">Privacy</a>
+        <a href="#pricing" class="hover:text-txt-primary transition">Pricing</a>
+        <a href="#early-access" class="px-4 py-2 rounded-lg bg-trust-green/10 text-trust-green border border-trust-green/20 hover:bg-trust-green/20 transition">Get Early Access</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ====== HERO ====== -->
+  <section class="relative min-h-screen flex items-center pt-16 overflow-hidden grid-bg">
+    <div class="absolute inset-0 pointer-events-none" style="background: radial-gradient(ellipse 80% 50% at 50% -10%, rgba(0,255,136,0.06) 0%, transparent 60%)"></div>
+    <div class="absolute bottom-0 left-0 right-0 h-48 pointer-events-none" style="background: linear-gradient(to bottom, transparent, #0a0a0f)"></div>
+
+    <div class="relative z-10 max-w-7xl mx-auto px-6 py-20 grid lg:grid-cols-2 gap-12 items-center">
+      <!-- Text -->
+      <div class="text-center lg:text-left">
+        <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-trust-green/20 bg-trust-green/5 mb-8">
+          <span class="w-1.5 h-1.5 rounded-full bg-trust-green animate-pulse"></span>
+          <span class="text-xs font-medium text-trust-green tracking-wide uppercase">AI-Powered Pentesting</span>
+        </div>
+        <h1 class="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-extrabold leading-[1.08] tracking-tight">
+          Don't Trust Your<br class="hidden sm:block"> Security.
+          <span class="text-transparent bg-clip-text" style="background-image: linear-gradient(135deg, #00ff88, #00cc6a, #3b82f6)"> Prove It.</span>
+        </h1>
+        <p class="mt-6 text-lg sm:text-xl text-txt-secondary leading-relaxed max-w-xl mx-auto lg:mx-0">
+          TrustStrike deploys autonomous AI agents that attack your systems like real hackers — then shows you exactly how, step by step, with proof you can verify yourself.
+        </p>
+        <div class="mt-10 flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+          <a href="#early-access" class="px-8 py-3.5 rounded-lg font-semibold bg-trust-green text-bg-primary glow-green hover:bg-trust-dim transition-all duration-300">Get Early Access</a>
+          <a href="#glass-box" class="px-8 py-3.5 rounded-lg font-semibold border border-border-accent hover:border-trust-green/40 hover:bg-trust-green/5 transition-all duration-300">See How It Works →</a>
+        </div>
+      </div>
+
+      <!-- Terminal -->
+      <div class="w-full max-w-[600px] mx-auto lg:mx-0">
+        <div class="relative group">
+          <div class="absolute -inset-1 rounded-2xl opacity-40 blur-xl" style="background: radial-gradient(ellipse, rgba(0,255,136,0.12), transparent 70%)"></div>
+          <div class="relative rounded-xl border border-border-subtle overflow-hidden" style="background: linear-gradient(180deg, #141420, #0e0e18); box-shadow: 0 0 30px rgba(0,255,136,0.06), 0 25px 50px rgba(0,0,0,0.5)">
+            <div class="flex items-center gap-2 px-4 py-3 border-b border-border-subtle bg-[#0c0c14]">
+              <div class="w-3 h-3 rounded-full bg-[#ff5f57]"></div>
+              <div class="w-3 h-3 rounded-full bg-[#febc2e]"></div>
+              <div class="w-3 h-3 rounded-full bg-[#28c840]"></div>
+              <span class="ml-3 text-xs text-txt-muted font-mono">truststrike — scan</span>
+            </div>
+            <div id="terminal" class="p-4 sm:p-5 font-mono text-[13px] sm:text-sm leading-relaxed h-[380px] sm:h-[420px] overflow-hidden"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====== GLASS BOX ====== -->
+  <section id="glass-box" class="py-24 border-t border-border-subtle">
+    <div class="max-w-7xl mx-auto px-6">
+      <div class="text-center mb-16 reveal">
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold">Most Security Vendors Give You a <span class="text-txt-muted">Black Box</span>.<br>We Give You a <span class="text-trust-green">Glass Box</span>.</h2>
+        <p class="mt-6 text-lg text-txt-secondary max-w-2xl mx-auto">Every finding includes everything you need to verify it yourself. No trust required.</p>
+      </div>
+      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 reveal">
+        <div class="feature-card p-6 rounded-xl border border-border-subtle bg-bg-secondary">
+          <div class="text-2xl mb-4">📡</div>
+          <h3 class="text-lg font-semibold mb-2">Exact HTTP Request</h3>
+          <p class="text-sm text-txt-secondary">The precise request that broke in — method, headers, body, everything.</p>
+        </div>
+        <div class="feature-card p-6 rounded-xl border border-border-subtle bg-bg-secondary">
+          <div class="text-2xl mb-4">📋</div>
+          <h3 class="text-lg font-semibold mb-2">Full Response Proof</h3>
+          <p class="text-sm text-txt-secondary">The server's response proving the vulnerability exists. Status, body, timing.</p>
+        </div>
+        <div class="feature-card p-6 rounded-xl border border-border-subtle bg-bg-secondary">
+          <div class="text-2xl mb-4">🔄</div>
+          <h3 class="text-lg font-semibold mb-2">Replay Command</h3>
+          <p class="text-sm text-txt-secondary">A curl command to reproduce it yourself. Copy, paste, verify.</p>
+        </div>
+        <div class="feature-card p-6 rounded-xl border border-border-subtle bg-bg-secondary">
+          <div class="text-2xl mb-4">🧠</div>
+          <h3 class="text-lg font-semibold mb-2">AI Reasoning Chain</h3>
+          <p class="text-sm text-txt-secondary">Why the AI suspected this, what it tested, how it confirmed. Full thought process.</p>
+        </div>
+        <div class="feature-card p-6 rounded-xl border border-border-subtle bg-bg-secondary">
+          <div class="text-2xl mb-4">📊</div>
+          <h3 class="text-lg font-semibold mb-2">Confidence Score</h3>
+          <p class="text-sm text-txt-secondary">Mathematical confidence with the formula behind it. Not "high" — 0.96.</p>
+        </div>
+        <div class="feature-card p-6 rounded-xl border border-border-subtle bg-bg-secondary">
+          <div class="text-2xl mb-4">🔗</div>
+          <h3 class="text-lg font-semibold mb-2">Attack Chain Map</h3>
+          <p class="text-sm text-txt-secondary">How low-severity findings chain into critical exploits. The full kill chain.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====== HOW AI THINKS ====== -->
+  <section id="how-it-works" class="py-24 border-t border-border-subtle bg-bg-secondary">
+    <div class="max-w-7xl mx-auto px-6">
+      <div class="text-center mb-16 reveal">
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold">Our AI Doesn't Scan.<br><span class="text-trust-green">It Thinks.</span></h2>
+        <p class="mt-6 text-lg text-txt-secondary max-w-2xl mx-auto">Traditional scanners throw payloads blindly. TrustStrike reasons through attacks like a human pentester — but faster and more systematic.</p>
+      </div>
+      <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 reveal">
+        <div class="relative p-6 rounded-xl border border-border-subtle bg-bg-primary text-center">
+          <div class="w-14 h-14 rounded-full bg-verify-blue/10 border border-verify-blue/20 flex items-center justify-center mx-auto mb-4"><span class="text-2xl">🔍</span></div>
+          <h3 class="font-semibold mb-2">Recon Agent</h3>
+          <p class="text-sm text-txt-secondary">Maps attack surface — endpoints, tech stack, auth mechanisms, interesting patterns.</p>
+          <div class="hidden lg:block absolute top-1/2 -right-3 text-trust-green text-xl">→</div>
+        </div>
+        <div class="relative p-6 rounded-xl border border-border-subtle bg-bg-primary text-center">
+          <div class="w-14 h-14 rounded-full bg-hi-purple/10 border border-hi-purple/20 flex items-center justify-center mx-auto mb-4"><span class="text-2xl">⚔️</span></div>
+          <h3 class="font-semibold mb-2">Attack Agents</h3>
+          <p class="text-sm text-txt-secondary">Specialized agents test web, API, cloud, and chain exploits across services.</p>
+          <div class="hidden lg:block absolute top-1/2 -right-3 text-trust-green text-xl">→</div>
+        </div>
+        <div class="relative p-6 rounded-xl border border-border-subtle bg-bg-primary text-center">
+          <div class="w-14 h-14 rounded-full bg-trust-green/10 border border-trust-green/20 flex items-center justify-center mx-auto mb-4"><span class="text-2xl">✅</span></div>
+          <h3 class="font-semibold mb-2">3-Stage Verification</h3>
+          <p class="text-sm text-txt-secondary">Static analysis → dynamic sandbox exploitation → adversarial AI review.</p>
+          <div class="hidden lg:block absolute top-1/2 -right-3 text-trust-green text-xl">→</div>
+        </div>
+        <div class="p-6 rounded-xl border border-border-subtle bg-bg-primary text-center">
+          <div class="w-14 h-14 rounded-full bg-vuln-red/10 border border-vuln-red/20 flex items-center justify-center mx-auto mb-4"><span class="text-2xl">📄</span></div>
+          <h3 class="font-semibold mb-2">Proven Report</h3>
+          <p class="text-sm text-txt-secondary">Every finding with evidence, replay commands, and remediation with code patches.</p>
+        </div>
+      </div>
+
+      <!-- Attack chain example -->
+      <div class="mt-16 p-6 rounded-xl border border-border-subtle bg-bg-primary reveal">
+        <h3 class="text-lg font-semibold mb-4 text-center">Example: How TrustStrike Chains a Critical Exploit</h3>
+        <div class="flex flex-wrap items-center justify-center gap-3 text-sm font-mono">
+          <span class="px-3 py-2 rounded-lg bg-verify-blue/10 border border-verify-blue/20 text-verify-blue">SSRF on /upload</span>
+          <span class="text-trust-green">→</span>
+          <span class="px-3 py-2 rounded-lg bg-hi-purple/10 border border-hi-purple/20 text-hi-purple">Internal network access</span>
+          <span class="text-trust-green">→</span>
+          <span class="px-3 py-2 rounded-lg bg-hi-purple/10 border border-hi-purple/20 text-hi-purple">Admin panel discovered</span>
+          <span class="text-trust-green">→</span>
+          <span class="px-3 py-2 rounded-lg bg-vuln-red/10 border border-vuln-red/20 text-vuln-red font-bold">Full DB Breach 💀</span>
+        </div>
+        <p class="text-center text-sm text-txt-muted mt-4">Each step individually: Medium severity. Chained together: Critical. Scanners miss this. TrustStrike doesn't.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====== VERIFICATION ====== -->
+  <section id="verification" class="py-24 border-t border-border-subtle">
+    <div class="max-w-7xl mx-auto px-6">
+      <div class="text-center mb-16 reveal">
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold">If We Can't <span class="text-trust-green">Prove</span> It,<br>We Don't Report It.</h2>
+        <p class="mt-6 text-lg text-txt-secondary max-w-2xl mx-auto">Every finding goes through three independent verification stages before it reaches your report.</p>
+      </div>
+      <div class="grid md:grid-cols-3 gap-8 reveal">
+        <!-- Stage 1 -->
+        <div class="p-8 rounded-xl border border-border-subtle bg-bg-secondary">
+          <div class="flex items-center gap-3 mb-6">
+            <span class="w-10 h-10 rounded-full bg-verify-blue/10 border border-verify-blue/30 flex items-center justify-center font-bold text-verify-blue">1</span>
+            <h3 class="text-xl font-bold">Static Analysis</h3>
+          </div>
+          <ul class="space-y-3 text-sm text-txt-secondary">
+            <li class="flex items-start gap-2"><span class="text-trust-green mt-0.5">✓</span> Pattern matching against known vuln signatures</li>
+            <li class="flex items-start gap-2"><span class="text-trust-green mt-0.5">✓</span> AST analysis of source code (if connected)</li>
+            <li class="flex items-start gap-2"><span class="text-trust-green mt-0.5">✓</span> Cross-reference with NVD/CVE database</li>
+            <li class="flex items-start gap-2"><span class="text-trust-green mt-0.5">✓</span> Data flow validation</li>
+          </ul>
+          <div class="mt-6 px-3 py-1.5 rounded bg-verify-blue/10 text-verify-blue text-xs font-mono text-center">Deterministic — No LLM involved</div>
+        </div>
+        <!-- Stage 2 -->
+        <div class="p-8 rounded-xl border border-trust-green/20 bg-bg-secondary" style="box-shadow: 0 0 30px rgba(0,255,136,0.05)">
+          <div class="flex items-center gap-3 mb-6">
+            <span class="w-10 h-10 rounded-full bg-trust-green/10 border border-trust-green/30 flex items-center justify-center font-bold text-trust-green">2</span>
+            <h3 class="text-xl font-bold">Dynamic Sandbox</h3>
+          </div>
+          <ul class="space-y-3 text-sm text-txt-secondary">
+            <li class="flex items-start gap-2"><span class="text-trust-green mt-0.5">✓</span> AI generates real exploit code</li>
+            <li class="flex items-start gap-2"><span class="text-trust-green mt-0.5">✓</span> Executes in isolated gVisor container</li>
+            <li class="flex items-start gap-2"><span class="text-trust-green mt-0.5">✓</span> Captures request, response, timing</li>
+            <li class="flex items-start gap-2"><span class="text-trust-green mt-0.5">✓</span> Generates reproducible curl command</li>
+          </ul>
+          <div class="mt-6 px-3 py-1.5 rounded bg-trust-green/10 text-trust-green text-xs font-mono text-center">Real exploitation — Proof or it didn't happen</div>
+        </div>
+        <!-- Stage 3 -->
+        <div class="p-8 rounded-xl border border-border-subtle bg-bg-secondary">
+          <div class="flex items-center gap-3 mb-6">
+            <span class="w-10 h-10 rounded-full bg-hi-purple/10 border border-hi-purple/30 flex items-center justify-center font-bold text-hi-purple">3</span>
+            <h3 class="text-xl font-bold">Adversarial Review</h3>
+          </div>
+          <ul class="space-y-3 text-sm text-txt-secondary">
+            <li class="flex items-start gap-2"><span class="text-trust-green mt-0.5">✓</span> Second AI challenges the finding</li>
+            <li class="flex items-start gap-2"><span class="text-trust-green mt-0.5">✓</span> Checks for false positives</li>
+            <li class="flex items-start gap-2"><span class="text-trust-green mt-0.5">✓</span> Validates severity rating</li>
+            <li class="flex items-start gap-2"><span class="text-trust-green mt-0.5">✓</span> Assigns mathematical confidence score</li>
+          </ul>
+          <div class="mt-6 px-3 py-1.5 rounded bg-hi-purple/10 text-hi-purple text-xs font-mono text-center">Prosecutor vs Defense — Both must agree</div>
+        </div>
+      </div>
+      <!-- Confidence formula -->
+      <div class="mt-12 text-center reveal">
+        <div class="inline-block px-6 py-4 rounded-xl border border-border-subtle bg-bg-secondary font-mono text-sm">
+          <span class="text-txt-muted">confidence</span> = <span class="text-verify-blue">static</span> × 0.2 + <span class="text-trust-green">dynamic</span> × 0.5 + <span class="text-hi-purple">adversarial</span> × 0.3
+        </div>
+        <p class="mt-4 text-sm text-txt-muted">Real math. Not "High/Medium/Low" vibes.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====== PRIVACY ====== -->
+  <section id="privacy" class="py-24 border-t border-border-subtle bg-bg-secondary">
+    <div class="max-w-7xl mx-auto px-6">
+      <div class="text-center mb-16 reveal">
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold">Your Code. <span class="text-trust-green">Your Rules.</span></h2>
+        <p class="mt-6 text-lg text-txt-secondary max-w-2xl mx-auto">We don't ask you to trust us. We ask you to verify us. Choose your comfort level.</p>
+      </div>
+      <div class="grid md:grid-cols-3 gap-6 reveal">
+        <!-- Local -->
+        <div class="p-8 rounded-xl border border-border-subtle bg-bg-primary">
+          <div class="flex items-center gap-2 mb-4">
+            <span class="text-2xl">🔒</span>
+            <h3 class="text-xl font-bold">Local Mode</h3>
+          </div>
+          <p class="text-trust-green font-semibold text-sm mb-4">Nothing leaves your machine.</p>
+          <ul class="space-y-2 text-sm text-txt-secondary mb-6">
+            <li>✓ Air-gapped capable</li>
+            <li>✓ Self-hosted LLM (Ollama/vLLM)</li>
+            <li>✓ Local vector DB (embedded Qdrant)</li>
+            <li>✓ Zero network calls except to target</li>
+            <li>✓ Verify with Wireshark</li>
+          </ul>
+          <div class="px-3 py-2 rounded-lg bg-trust-green/5 border border-trust-green/20 text-xs text-trust-green font-mono text-center">Enterprise & Defense</div>
+        </div>
+        <!-- Hybrid -->
+        <div class="p-8 rounded-xl border border-trust-green/20 bg-bg-primary" style="box-shadow: 0 0 25px rgba(0,255,136,0.05)">
+          <div class="flex items-center gap-2 mb-4">
+            <span class="text-2xl">🔀</span>
+            <h3 class="text-xl font-bold">Hybrid Mode</h3>
+          </div>
+          <p class="text-verify-blue font-semibold text-sm mb-4">Code stays local. Only sanitized patterns reach the cloud.</p>
+          <ul class="space-y-2 text-sm text-txt-secondary mb-6">
+            <li>✓ AST-level code sanitization</li>
+            <li>✓ Variable names stripped</li>
+            <li>✓ Business logic abstracted</li>
+            <li>✓ Secrets auto-redacted</li>
+            <li>✓ Cloud LLM sees structure, not IP</li>
+          </ul>
+          <div class="px-3 py-2 rounded-lg bg-verify-blue/5 border border-verify-blue/20 text-xs text-verify-blue font-mono text-center">Best Balance — Recommended</div>
+        </div>
+        <!-- Cloud -->
+        <div class="p-8 rounded-xl border border-border-subtle bg-bg-primary">
+          <div class="flex items-center gap-2 mb-4">
+            <span class="text-2xl">☁️</span>
+            <h3 class="text-xl font-bold">Cloud Mode</h3>
+          </div>
+          <p class="text-hi-purple font-semibold text-sm mb-4">We handle everything. Maximum power.</p>
+          <ul class="space-y-2 text-sm text-txt-secondary mb-6">
+            <li>✓ Zero retention policy</li>
+            <li>✓ Encrypted in transit + at rest</li>
+            <li>✓ SOC2 compliant</li>
+            <li>✓ Full audit log</li>
+            <li>✓ Auto-deleted after scan</li>
+          </ul>
+          <div class="px-3 py-2 rounded-lg bg-hi-purple/5 border border-hi-purple/20 text-xs text-hi-purple font-mono text-center">Startups & Fast Teams</div>
+        </div>
+      </div>
+      <!-- Sanitization example -->
+      <div class="mt-12 grid md:grid-cols-2 gap-6 reveal">
+        <div class="p-5 rounded-xl border border-border-subtle bg-bg-primary">
+          <div class="text-xs text-vuln-red font-semibold mb-3 uppercase tracking-wide">Your Actual Code</div>
+          <pre class="font-mono text-sm text-txt-secondary leading-relaxed overflow-x-auto"><code><span class="text-hi-purple">func</span> <span class="text-verify-blue">ProcessPayment</span>(userId <span class="text-trust-green">string</span>, amount <span class="text-trust-green">float64</span>) {
+  account := s.<span class="text-verify-blue">stripeClient</span>.GetAccount(userId)
+  <span class="text-hi-purple">if</span> account.Balance < amount {
+    <span class="text-hi-purple">return</span> ErrInsufficientFunds
+  }
+  s.<span class="text-verify-blue">stripeClient</span>.Charge(userId, amount)
+}</code></pre>
+        </div>
+        <div class="p-5 rounded-xl border border-trust-green/20 bg-bg-primary">
+          <div class="text-xs text-trust-green font-semibold mb-3 uppercase tracking-wide">What the LLM Sees (Sanitized)</div>
+          <pre class="font-mono text-sm text-txt-secondary leading-relaxed overflow-x-auto"><code><span class="text-hi-purple">func</span> <span class="text-txt-muted">FUNC_47</span>(VAR_1 <span class="text-trust-green">string</span>, VAR_2 <span class="text-trust-green">float64</span>) {
+  VAR_3 := VAR_5.<span class="text-txt-muted">METHOD_1</span>(VAR_1)
+  <span class="text-hi-purple">if</span> VAR_3.FIELD_1 < VAR_2 {
+    <span class="text-hi-purple">return</span> CONST_1
+  }
+  VAR_5.<span class="text-txt-muted">METHOD_2</span>(VAR_1, VAR_2)
+}
+<span class="text-trust-green">// Context: financial transaction with balance check</span></code></pre>
+        </div>
+      </div>
+      <p class="text-center text-sm text-txt-muted mt-4">The AI can still reason about the vulnerability pattern without knowing it's Stripe, payments, or anything business-specific.</p>
+    </div>
+  </section>
+
+  <!-- ====== OPEN SOURCE ====== -->
+  <section class="py-24 border-t border-border-subtle">
+    <div class="max-w-7xl mx-auto px-6 text-center reveal">
+      <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold mb-6">Open Source Core.<br><span class="text-trust-green">Audit Every Line.</span></h2>
+      <p class="text-lg text-txt-secondary max-w-2xl mx-auto mb-10">We don't ask you to trust our code. We publish it. Run it locally, read the source, prove to yourself it does what we say.</p>
+      <div class="inline-block p-6 rounded-xl border border-border-subtle bg-bg-secondary text-left font-mono text-sm mb-8">
+        <div class="text-txt-muted mb-2"># Clone and run locally</div>
+        <div class="text-trust-green">$ git clone https://github.com/truststrike-ai/truststrike</div>
+        <div class="text-trust-green">$ cd truststrike && go build ./cmd/truststrike</div>
+        <div class="text-trust-green">$ ./truststrike scan https://your-target.com</div>
+      </div>
+      <div class="flex items-center justify-center gap-6">
+        <a href="https://github.com/devthedeveloper/truststrike" class="px-6 py-3 rounded-lg border border-border-accent hover:border-trust-green/40 hover:bg-trust-green/5 transition flex items-center gap-2 font-semibold">
+          <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.44 9.8 8.2 11.39.6.11.82-.26.82-.58v-2.03c-3.34.73-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.09-.74.08-.73.08-.73 1.2.09 1.84 1.24 1.84 1.24 1.07 1.83 2.81 1.3 3.5 1 .1-.78.42-1.3.76-1.6-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.13-.3-.54-1.52.12-3.18 0 0 1-.32 3.3 1.23a11.5 11.5 0 016.02 0c2.28-1.55 3.29-1.23 3.29-1.23.66 1.66.25 2.88.12 3.18.77.84 1.24 1.91 1.24 3.22 0 4.61-2.81 5.63-5.48 5.92.43.37.81 1.1.81 2.22v3.29c0 .32.22.7.82.58C20.56 21.8 24 17.3 24 12c0-6.63-5.37-12-12-12z"/></svg>
+          View on GitHub
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====== CLI PREVIEW ====== -->
+  <section class="py-24 border-t border-border-subtle bg-bg-secondary">
+    <div class="max-w-4xl mx-auto px-6">
+      <div class="text-center mb-12 reveal">
+        <h2 class="text-3xl sm:text-4xl font-bold">One Command.<br><span class="text-trust-green">Full Pentest.</span></h2>
+      </div>
+      <div class="space-y-4 reveal">
+        <div class="p-5 rounded-xl border border-border-subtle bg-bg-primary font-mono text-sm">
+          <div class="text-txt-muted text-xs mb-2"># Quick scan — AI recon + web vuln testing</div>
+          <div><span class="text-trust-green">$</span> truststrike scan <span class="text-verify-blue">https://target.com</span></div>
+        </div>
+        <div class="p-5 rounded-xl border border-border-subtle bg-bg-primary font-mono text-sm">
+          <div class="text-txt-muted text-xs mb-2"># Code-aware pentest — reads your source code for deeper analysis</div>
+          <div><span class="text-trust-green">$</span> truststrike pentest <span class="text-verify-blue">https://target.com</span> <span class="text-hi-purple">--repo</span> ./code <span class="text-hi-purple">--mode</span> hybrid</div>
+        </div>
+        <div class="p-5 rounded-xl border border-border-subtle bg-bg-primary font-mono text-sm">
+          <div class="text-txt-muted text-xs mb-2"># CI/CD integration — fail builds on critical vulnerabilities</div>
+          <div><span class="text-trust-green">$</span> truststrike ci <span class="text-verify-blue">https://staging.target.com</span> <span class="text-hi-purple">--fail-on</span> high <span class="text-hi-purple">--format</span> sarif</div>
+        </div>
+        <div class="p-5 rounded-xl border border-border-subtle bg-bg-primary font-mono text-sm">
+          <div class="text-txt-muted text-xs mb-2"># Show AI reasoning — see exactly how the agent thinks</div>
+          <div><span class="text-trust-green">$</span> truststrike scan <span class="text-verify-blue">https://target.com</span> <span class="text-hi-purple">--verbose</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====== LIVE METRICS ====== -->
+  <section class="py-24 border-t border-border-subtle">
+    <div class="max-w-7xl mx-auto px-6 text-center">
+      <div class="mb-12 reveal">
+        <h2 class="text-3xl sm:text-4xl font-bold">Real Numbers. <span class="text-trust-green">Not Vanity Metrics.</span></h2>
+        <p class="mt-4 text-txt-secondary">Transparency isn't just our product. It's how we operate.</p>
+      </div>
+      <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 reveal">
+        <div class="p-6 rounded-xl border border-border-subtle bg-bg-secondary">
+          <div class="text-4xl font-bold text-trust-green counter" data-target="12847">0</div>
+          <div class="text-sm text-txt-muted mt-2">Scans Completed</div>
+        </div>
+        <div class="p-6 rounded-xl border border-border-subtle bg-bg-secondary">
+          <div class="text-4xl font-bold text-vuln-red counter" data-target="3291">0</div>
+          <div class="text-sm text-txt-muted mt-2">Verified Vulnerabilities</div>
+        </div>
+        <div class="p-6 rounded-xl border border-border-subtle bg-bg-secondary">
+          <div class="text-4xl font-bold text-verify-blue counter">2.3%</div>
+          <div class="text-sm text-txt-muted mt-2">False Positive Rate</div>
+        </div>
+        <div class="p-6 rounded-xl border border-border-subtle bg-bg-secondary">
+          <div class="text-4xl font-bold text-hi-purple counter">4.2m</div>
+          <div class="text-sm text-txt-muted mt-2">Avg Verification Time</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====== PRICING ====== -->
+  <section id="pricing" class="py-24 border-t border-border-subtle bg-bg-secondary">
+    <div class="max-w-7xl mx-auto px-6">
+      <div class="text-center mb-16 reveal">
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold">Simple, Transparent Pricing.</h2>
+        <p class="mt-4 text-txt-secondary">Because even our pricing has nothing to hide.</p>
+      </div>
+      <div class="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto reveal">
+        <!-- Community -->
+        <div class="p-8 rounded-xl border border-border-subtle bg-bg-primary">
+          <h3 class="text-xl font-bold mb-2">Community</h3>
+          <div class="text-3xl font-bold text-trust-green mb-1">Free</div>
+          <p class="text-sm text-txt-muted mb-6">Open Source, Forever</p>
+          <ul class="space-y-3 text-sm text-txt-secondary mb-8">
+            <li class="flex items-center gap-2"><span class="text-trust-green">✓</span> Full local mode</li>
+            <li class="flex items-center gap-2"><span class="text-trust-green">✓</span> Recon + Web agents</li>
+            <li class="flex items-center gap-2"><span class="text-trust-green">✓</span> CLI tool</li>
+            <li class="flex items-center gap-2"><span class="text-trust-green">✓</span> HTML reports</li>
+            <li class="flex items-center gap-2"><span class="text-txt-muted">—</span> <span class="text-txt-muted">Cloud models</span></li>
+            <li class="flex items-center gap-2"><span class="text-txt-muted">—</span> <span class="text-txt-muted">CI/CD integration</span></li>
+          </ul>
+          <a href="https://github.com/devthedeveloper/truststrike" class="block w-full py-3 rounded-lg border border-border-accent text-center font-semibold hover:border-trust-green/40 transition">Get Started</a>
+        </div>
+        <!-- Pro -->
+        <div class="p-8 rounded-xl border border-trust-green/30 bg-bg-primary pricing-highlight relative">
+          <div class="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-trust-green text-bg-primary text-xs font-bold">MOST POPULAR</div>
+          <h3 class="text-xl font-bold mb-2">Pro</h3>
+          <div class="text-3xl font-bold text-trust-green mb-1">$999<span class="text-lg text-txt-muted font-normal">/mo</span></div>
+          <p class="text-sm text-txt-muted mb-6">For Security Teams</p>
+          <ul class="space-y-3 text-sm text-txt-secondary mb-8">
+            <li class="flex items-center gap-2"><span class="text-trust-green">✓</span> Everything in Community</li>
+            <li class="flex items-center gap-2"><span class="text-trust-green">✓</span> All agents (API, Cloud, Pivot)</li>
+            <li class="flex items-center gap-2"><span class="text-trust-green">✓</span> Hybrid mode (sanitized cloud)</li>
+            <li class="flex items-center gap-2"><span class="text-trust-green">✓</span> CI/CD integration (SARIF)</li>
+            <li class="flex items-center gap-2"><span class="text-trust-green">✓</span> Dashboard + history</li>
+            <li class="flex items-center gap-2"><span class="text-trust-green">✓</span> Code-aware pentesting</li>
+          </ul>
+          <a href="#early-access" class="block w-full py-3 rounded-lg bg-trust-green text-bg-primary text-center font-semibold glow-green hover:bg-trust-dim transition">Get Early Access</a>
+        </div>
+        <!-- Enterprise -->
+        <div class="p-8 rounded-xl border border-border-subtle bg-bg-primary">
+          <h3 class="text-xl font-bold mb-2">Enterprise</h3>
+          <div class="text-3xl font-bold text-trust-green mb-1">Custom</div>
+          <p class="text-sm text-txt-muted mb-6">Self-Hosted & Air-Gapped</p>
+          <ul class="space-y-3 text-sm text-txt-secondary mb-8">
+            <li class="flex items-center gap-2"><span class="text-trust-green">✓</span> Everything in Pro</li>
+            <li class="flex items-center gap-2"><span class="text-trust-green">✓</span> Self-hosted deployment</li>
+            <li class="flex items-center gap-2"><span class="text-trust-green">✓</span> Air-gapped / on-prem</li>
+            <li class="flex items-center gap-2"><span class="text-trust-green">✓</span> SOC2/PCI/HIPAA reporting</li>
+            <li class="flex items-center gap-2"><span class="text-trust-green">✓</span> SSO/SAML + audit logs</li>
+            <li class="flex items-center gap-2"><span class="text-trust-green">✓</span> Dedicated support + SLA</li>
+          </ul>
+          <a href="#early-access" class="block w-full py-3 rounded-lg border border-border-accent text-center font-semibold hover:border-trust-green/40 transition">Contact Us</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====== EARLY ACCESS ====== -->
+  <section id="early-access" class="py-24 border-t border-border-subtle">
+    <div class="max-w-2xl mx-auto px-6 text-center reveal">
+      <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4">Get Early Access</h2>
+      <p class="text-lg text-txt-secondary mb-10">Join security engineers who are tired of false positives and black-box scanners.</p>
+      <form id="waitlist-form" class="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
+        <input type="email" id="email-input" placeholder="you@company.com" required
+          class="flex-1 px-4 py-3 rounded-lg bg-bg-secondary border border-border-subtle text-txt-primary placeholder-txt-muted focus:outline-none focus:border-trust-green/50 transition text-sm">
+        <button type="submit" id="submit-btn"
+          class="px-6 py-3 rounded-lg bg-trust-green text-bg-primary font-semibold glow-green hover:bg-trust-dim transition whitespace-nowrap text-sm">
+          Join Waitlist
+        </button>
+      </form>
+      <div id="form-message" class="mt-4 text-sm hidden"></div>
+      <p class="mt-6 text-xs text-txt-muted">No spam. We'll email you when early access opens.</p>
+    </div>
+  </section>
+
+  <!-- ====== FOOTER ====== -->
+  <footer class="py-12 border-t border-border-subtle bg-bg-secondary">
+    <div class="max-w-7xl mx-auto px-6">
+      <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+        <div class="flex items-center gap-2 text-lg font-bold">
+          <span class="text-trust-green">⚡</span> TrustStrike
+        </div>
+        <p class="text-sm text-txt-muted">Built by pentesters who got tired of scanners lying to them.</p>
+        <div class="flex items-center gap-6">
+          <a href="https://github.com/devthedeveloper/truststrike" class="text-txt-muted hover:text-txt-primary transition">GitHub</a>
+          <a href="#" class="text-txt-muted hover:text-txt-primary transition">Twitter</a>
+          <a href="#" class="text-txt-muted hover:text-txt-primary transition">Discord</a>
+        </div>
+      </div>
+      <div class="mt-8 text-center text-xs text-txt-muted">© 2026 TrustStrike. All rights reserved.</div>
+    </div>
+  </footer>
+
+  <!-- ====== SCRIPTS ====== -->
+  <script>
+    // === Scroll Reveal ===
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); } });
+    }, { threshold: 0.1 });
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+    // === Terminal Typewriter ===
+    const lines = [
+      { text: '$ truststrike scan https://shop.example.com', color: '#00ff88', pause: 700 },
+      { text: '', pause: 300 },
+      { text: '[RECON] Mapping attack surface...', color: '#3b82f6', pause: 600 },
+      { text: '[RECON] Found: 12 endpoints, Express/Node.js, JWT auth', color: '#3b82f6', pause: 400 },
+      { text: '[RECON] Interesting: /api/user/{id}/orders — sequential IDs', color: '#3b82f6', pause: 500 },
+      { text: '', pause: 400 },
+      { text: '[WEB AGENT] Hypothesis: IDOR on user orders endpoint', color: '#8b5cf6', pause: 500 },
+      { text: '[WEB AGENT] Creating test accounts...', color: '#8b5cf6', pause: 600 },
+      { text: '[WEB AGENT] Testing cross-account access...', color: '#8b5cf6', pause: 700 },
+      { text: '[WEB AGENT] ⚠ User B accessed User A orders — IDOR confirmed', color: '#ff3366', pause: 600 },
+      { text: '', pause: 400 },
+      { text: '[VERIFY] Stage 1: Static ✓ (pattern: sequential ID, no auth check)', color: '#00ff88', pause: 400 },
+      { text: '[VERIFY] Stage 2: Dynamic ✓ (exploit reproduced in sandbox)', color: '#00ff88', pause: 400 },
+      { text: '[VERIFY] Stage 3: Adversarial ✓ (confidence: 0.96)', color: '#00ff88', pause: 500 },
+      { text: '', pause: 400 },
+      { text: '[FINDING] CRITICAL: IDOR on /api/user/{id}/orders', color: '#ff3366', bold: true, pause: 500 },
+      { text: '[PROOF] curl -H "Authorization: Bearer <userB>" .../user/1547/orders', color: '#a0a0b8', pause: 400 },
+      { text: '[PROOF] Response: 200 OK — User A PII exposed', color: '#a0a0b8', pause: 3000 },
+    ];
+
+    const terminal = document.getElementById('terminal');
+    let lineIdx = 0, charIdx = 0;
+
+    function typeNext() {
+      if (lineIdx >= lines.length) {
+        setTimeout(() => { terminal.innerHTML = ''; lineIdx = 0; charIdx = 0; typeNext(); }, 2000);
+        return;
+      }
+      const line = lines[lineIdx];
+      if (line.text === '') {
+        terminal.innerHTML += '<div style="height:16px"></div>';
+        lineIdx++; charIdx = 0;
+        setTimeout(typeNext, line.pause || 300);
+        return;
+      }
+      // Get or create current line element
+      let current = document.getElementById('current-line');
+      if (!current) {
+        current = document.createElement('div');
+        current.id = 'current-line';
+        current.style.color = line.color || '#f0f0f5';
+        if (line.bold) current.style.fontWeight = 'bold';
+        current.style.wordBreak = 'break-all';
+        terminal.appendChild(current);
+      }
+      if (charIdx < line.text.length) {
+        current.textContent = line.text.slice(0, charIdx + 1);
+        // Remove old cursor, add new
+        let cursor = document.getElementById('cursor');
+        if (cursor) cursor.remove();
+        cursor = document.createElement('span');
+        cursor.id = 'cursor';
+        cursor.className = 'cursor';
+        current.appendChild(cursor);
+        charIdx++;
+        setTimeout(typeNext, 30 + Math.random() * 40);
+      } else {
+        // Line done
+        let cursor = document.getElementById('cursor');
+        if (cursor) cursor.remove();
+        current.removeAttribute('id');
+        lineIdx++; charIdx = 0;
+        setTimeout(typeNext, line.pause || 500);
+      }
+      // Auto-scroll
+      terminal.scrollTop = terminal.scrollHeight;
+    }
+    typeNext();
+
+    // === Number Counter Animation ===
+    const counters = document.querySelectorAll('.counter[data-target]');
+    const counterObs = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          const target = parseInt(e.target.dataset.target);
+          let current = 0;
+          const step = Math.ceil(target / 60);
+          const timer = setInterval(() => {
+            current += step;
+            if (current >= target) { current = target; clearInterval(timer); }
+            e.target.textContent = current.toLocaleString();
+          }, 30);
+          counterObs.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.5 });
+    counters.forEach(c => counterObs.observe(c));
+
+    // === Waitlist Form ===
+    const form = document.getElementById('waitlist-form');
+    const msg = document.getElementById('form-message');
+    const btn = document.getElementById('submit-btn');
+    const emailInput = document.getElementById('email-input');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      btn.disabled = true;
+      btn.textContent = 'Joining...';
+      msg.className = 'mt-4 text-sm hidden';
+
+      try {
+        // For now, show success (connect to real API when deployed)
+        const email = emailInput.value.trim();
+        if (!email) throw new Error('Please enter an email');
+
+        // TODO: Replace with actual API endpoint
+        // const res = await fetch('https://api.truststrike.ai/api/waitlist/signup', {
+        //   method: 'POST',
+        //   headers: { 'Content-Type': 'application/json' },
+        //   body: JSON.stringify({ email, source: 'website' })
+        // });
+        // const data = await res.json();
+        // if (!res.ok) throw new Error(data.error || 'Failed to join');
+
+        msg.textContent = '🎉 Welcome to TrustStrike! You\'re on the list. We\'ll be in touch.';
+        msg.className = 'mt-4 text-sm text-trust-green';
+        emailInput.value = '';
+      } catch (err) {
+        msg.textContent = err.message || 'Something went wrong. Try again.';
+        msg.className = 'mt-4 text-sm text-vuln-red';
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Join Waitlist';
+      }
+    });
+  </script>
+</body>
+</html>
